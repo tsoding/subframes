@@ -17,7 +17,7 @@ static Control controls[] = {
 };
 
 #define PLAYER_SPEED 1000
-#define REAL_FPS 24
+#define REAL_FPS 30
 #define TARGET_FPS 480
 #define TARGET_DT (1.0/TARGET_FPS)
 #define GRAVITY 1000.0f
@@ -37,7 +37,7 @@ typedef struct {
 
 int main()
 {
-    InitWindow(800, 600, "Subframes");
+    InitWindow(1600, 900, "Subframes");
     SetTargetFPS(REAL_FPS);
     Vector2s positions = {0};
     Vector2s velocities = {0};
@@ -56,7 +56,9 @@ int main()
 
             if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 nob_da_append(&positions, GetMousePosition());
-                nob_da_append(&velocities, ((Vector2) {500, 500}));
+                float angle = DEG2RAD*GetRandomValue(0, 360);
+                Vector2 dir = {500*cosf(angle), 500*sinf(angle)};
+                nob_da_append(&velocities, dir);
                 nob_da_append(&colors, ColorFromHSV(GetRandomValue(0, 360), 0.5, 0.8));
             }
 
@@ -71,9 +73,11 @@ int main()
                     if (nx - radius <= 0) {
                         positions.items[i].x = radius;
                         velocities.items[i].x *= -COLLISION_DAMPING;
+                        velocities.items[i].x += dwinpos.x*TARGET_DT/real_dt*300;
                     } else if (nx + radius >= w) {
                         positions.items[i].x = w - radius;
                         velocities.items[i].x *= -COLLISION_DAMPING;
+                        velocities.items[i].x += dwinpos.x*TARGET_DT/real_dt*300;
                     } else {
                         positions.items[i].x = nx;
                     }
@@ -82,9 +86,11 @@ int main()
                     if (ny - radius <= 0) {
                         positions.items[i].y = radius;
                         velocities.items[i].y *= -COLLISION_DAMPING;
+                        velocities.items[i].y += dwinpos.y*TARGET_DT/real_dt*300;
                     } else if (ny + radius >= h) {
                         positions.items[i].y = h - radius;
                         velocities.items[i].y *= -COLLISION_DAMPING;
+                        velocities.items[i].y += dwinpos.y*TARGET_DT/real_dt*300;
                     } else {
                         positions.items[i].y = ny;
                     }
@@ -93,7 +99,6 @@ int main()
                 }
             }
 
-            DrawText(TextFormat("%f %f", dwinpos.x, dwinpos.y), 0, 0, 32, WHITE);
         EndDrawing();
 
         prev_winpos = winpos;
